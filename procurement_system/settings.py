@@ -123,3 +123,4 @@ STATIC_URL = 'static/'
 
 CORS_ALLOW_ALL_ORIGINS = True
 AUTH_USER_MODEL = 'core.User'
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
