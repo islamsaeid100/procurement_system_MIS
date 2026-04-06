@@ -1,0 +1,156 @@
+/* استدعاء خط حديث من جوجل */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+:root {
+  --bg-light: #F3F4F4;    /* الرمادي الفاتح جداً للخلفية */
+  --primary: #853953;     /* العنابي الفاتح للزراير والتمييز */
+  --secondary: #612D53;   /* العنابي الغامق للـ Hover */
+  --dark: #2C2C2C;        /* الرمادي الغامق جداً للنصوص والـ Sidebar */
+  --white: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-light);
+  color: var(--dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* تصميم الـ Navbar الجانبي (أو العلوي بطابع حديث) */
+.navbar {
+  background-color: var(--dark);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  color: var(--bg-light);
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -1px;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin: 0;
+}
+
+.nav-links a {
+  color: #bdc3c7;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.nav-links a:hover {
+  color: var(--white);
+  background: rgba(255,255,255,0.05);
+}
+
+.active-link {
+  color: var(--white) !important;
+  background: var(--primary) !important;
+  box-shadow: 0 4px 10px rgba(133, 57, 83, 0.3);
+}
+
+/* تصميم الحاويات والصفحات */
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.page-content {
+  background: var(--white);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* الاستايل الحديث للجداول */
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+.styled-table th {
+  background-color: var(--bg-light);
+  color: var(--dark);
+  text-align: left;
+  padding: 15px;
+  font-weight: 600;
+  border-bottom: 2px solid #eee;
+}
+
+.styled-table td {
+  padding: 15px;
+  border-bottom: 1px solid #f9f9f9;
+}
+
+.styled-table tr:hover {
+  background-color: #fcfcfc;
+}
+
+/* الزراير (Buttons) */
+button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s all;
+}
+
+button:hover {
+  background-color: var(--secondary);
+  transform: translateY(-2px);
+}
+
+/* الحقول (Inputs) */
+input, select, textarea {
+  border: 1px solid #ddd;
+  padding: 12px;
+  border-radius: 8px;
+  outline: none;
+  transition: 0.3s;
+}
+
+input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(133, 57, 83, 0.1);
+}
+
+/* كروت الداشبورد */
+.stats-card {
+  border-radius: 12px;
+  padding: 25px;
+  color: white;
+  transition: transform 0.3s;
+}
+
+.stats-card:hover {
+  transform: scale(1.02);
+}
