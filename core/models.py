@@ -46,11 +46,11 @@ class PurchaseOrder(models.Model):
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
-    def calculate_total(self):
-        total = sum(item.quantity * item.unit_price for item in self.items.all())
-        self.total_amount = total
-        self.save()
 
+    def __str__(self):
+        return self.order_number
+
+# ده الجدول اللي كان ناقص ومسبب الـ Error
 class OrderItem(models.Model):
     order = models.ForeignKey(PurchaseOrder, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -64,6 +64,3 @@ class Invoice(models.Model):
     due_date = models.DateField()
     is_paid = models.BooleanField(default=False)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
-
-    def __str__(self):
-        return f"Invoice {self.invoice_number} for Order {self.order.order_number}"
