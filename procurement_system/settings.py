@@ -124,6 +124,8 @@ STATIC_URL = 'static/'
 
 CORS_ALLOW_ALL_ORIGINS = True
 AUTH_USER_MODEL = 'core.User'
+<<<<<<< HEAD
+=======
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -136,3 +138,4 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated', # أي حد مسجل دخول يدخل
     ],
 }
+>>>>>>> 0f69498e7aae3db51c1316b76db8a4a800ea3b4f

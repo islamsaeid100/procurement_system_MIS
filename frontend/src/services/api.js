@@ -7,10 +7,9 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('access_token');
     if (token) {
-        // تأكد إن السطر ده مكتوب صح Authorization و Bearer
-        config.headers.Authorization = `Bearer ${token}`; 
+        config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
 });
 
-export default api; 
+export default api;
