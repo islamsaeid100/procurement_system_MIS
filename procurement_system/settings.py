@@ -124,18 +124,23 @@ STATIC_URL = 'static/'
 
 CORS_ALLOW_ALL_ORIGINS = True
 AUTH_USER_MODEL = 'core.User'
-<<<<<<< HEAD
-=======
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+# ... بعد إعدادات الـ Static والـ Databases
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated', # أي حد مسجل دخول يدخل
+        'rest_framework.permissions.IsAuthenticated',
     ],
 }
->>>>>>> 0f69498e7aae3db51c1316b76db8a4a800ea3b4f
+
+# تأكد إن الـ CORS مسموح به للفرونت-إند
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+# إذا كنت تستخدم ملفات ميديا (اختياري)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
