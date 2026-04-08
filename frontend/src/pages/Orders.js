@@ -4,8 +4,6 @@ import api from '../services/api';
 const Orders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    
-    // States جديدة للإضافة
     const [suppliers, setSuppliers] = useState([]);
     const [products, setProducts] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -27,9 +25,7 @@ const Orders = () => {
             ]);
             setSuppliers(supRes.data);
             setProducts(prodRes.data);
-        } catch (err) {
-            console.error("Error loading suppliers/products", err);
-        }
+        } catch (err) { console.error("Error loading data", err); }
     };
 
     const fetchOrders = async () => {
@@ -43,34 +39,23 @@ const Orders = () => {
         }
     };
 
-    // --- وظيفة إضافة أوردر جديد ---
     const handleCreateOrder = async (e) => {
         e.preventDefault();
-        
-        // تجهيز البيانات بالشكل اللي الـ Serializer الجديد مستنيه
         const orderData = {
-            supplier: parseInt(formData.supplier), // تحويل الـ ID لرقم
+            supplier: parseInt(formData.supplier),
             items: formData.items.map(item => ({
-                product: parseInt(item.product), // تأكد إن الـ ID رقم
+                product: parseInt(item.product),
                 quantity: parseInt(item.quantity)
             }))
         };
-    
-        console.log("Sending Data:", orderData); // عشان تشوف البيانات في الـ Console قبل ما تتبعت
-    
         try {
             const res = await api.post('orders/', orderData);
-            alert("تم إنشاء طلب الشراء بنجاح! رقم الطلب: " + res.data.order_number);
+            alert("Order Created Successfully! PO: " + res.data.order_number);
             setShowAddForm(false);
             setFormData({ supplier: '', items: [{ product: '', quantity: 1 }] });
-            fetchOrders(); // تحديث القائمة
+            fetchOrders();
         } catch (err) {
-            console.error("Full Error Object:", err);
-            // عرض الخطأ بشكل أوضح بدل كلمة undefined
-            const errorMsg = err.response?.data 
-                ? JSON.stringify(err.response.data) 
-                : "حدث خطأ غير متوقع في الاتصال بالسيرفر";
-            alert("خطأ في الإضافة: " + errorMsg);
+            alert("Error: " + JSON.stringify(err.response?.data));
         }
     };
 
@@ -84,137 +69,151 @@ const Orders = () => {
         setFormData({ ...formData, items: newItems });
     };
 
-    // --- الدالة القديمة للموافقة ---
     const handleApprove = async (orderId) => {
-        if (window.confirm("هل أنت متأكد من الموافقة؟ سيتم إصدار فاتورة تلقائياً.")) {
+        if (window.confirm("Approve this order? An invoice will be generated.")) {
             try {
                 await api.post(`orders/${orderId}/approve/`);
-                alert("تمت الموافقة بنجاح!");
+                alert("Order Approved!");
                 fetchOrders();
             } catch (err) {
-                alert("فشل في الموافقة: " + (err.response?.data?.detail || "ليس لديك صلاحية"));
+                alert("Action failed: " + (err.response?.data?.detail || "Permission denied"));
             }
         }
     };
 
-    if (loading) return <div className="page-content">Fetching Purchase Orders...</div>;
+    if (loading) return <div className="page-content" style={{textAlign:'center', padding:'50px'}}>Processing Orders...</div>;
 
     return (
-        <div className="page-content">
-            <header style={{ borderBottom: '2px solid #853953', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ color: '#853953' }}>Purchase Orders Management</h2>
+        <div className="orders-container">
+            {/* 1. Header القسم العلوي */}
+            <header className="page-content no-print" style={{ marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h2 style={{ color: 'var(--color-1)', margin: 0 }}>Purchase Orders</h2>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>Create and manage procurement requests</p>
+                </div>
                 <button 
                     onClick={() => setShowAddForm(!showAddForm)}
-                    style={{ backgroundColor: '#853953', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer' }}
+                    style={{ background: showAddForm ? 'var(--text-muted)' : 'linear-gradient(90deg, var(--color-2), var(--color-3))' }}
                 >
-                    {showAddForm ? 'Close' : '+ New Purchase Order'}
+                    {showAddForm ? 'Cancel' : '+ New Request'}
                 </button>
             </header>
 
-            {/* --- فورم إضافة أوردر جديد --- */}
+            {/* 2. فورم الإضافة المطور */}
             {showAddForm && (
-                <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', marginBottom: '30px', border: '1px solid #853953' }}>
+                <div className="page-content" style={{ marginBottom: '30px', animation: 'slideDown 0.4s ease' }}>
+                    <h3 style={{ color: 'var(--color-1)', marginTop: 0 }}>Create New Purchase Order</h3>
                     <form onSubmit={handleCreateOrder}>
-                        <div style={{ marginBottom: '15px' }}>
-                            <label>Select Supplier:</label>
-                            <select 
-                                style={{ width: '100%', padding: '10px', marginTop: '5px' }}
-                                value={formData.supplier}
-                                onChange={(e) => setFormData({...formData, supplier: e.target.value})}
-                                required
-                            >
-                                <option value="">-- Choose Supplier --</option>
-                                {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                            </select>
+                        <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>Target Supplier</label>
+                                <select 
+                                    className="modern-select"
+                                    value={formData.supplier}
+                                    onChange={(e) => setFormData({...formData, supplier: e.target.value})}
+                                    required
+                                    style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1.5px solid #e2e8f0' }}
+                                >
+                                    <option value="">-- Select Provider --</option>
+                                    {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600' }}>Selected Items</label>
+                                {formData.items.map((item, index) => (
+                                    <div key={index} style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                                        <select 
+                                            style={{ flex: 3, padding: '12px', borderRadius: '12px', border: '1.5px solid #e2e8f0' }}
+                                            value={item.product}
+                                            onChange={(e) => handleItemChange(index, 'product', e.target.value)}
+                                            required
+                                        >
+                                            <option value="">-- Choose Product --</option>
+                                            {products.map(p => <option key={p.id} value={p.id}>{p.name} ({p.unit_price} EGP)</option>)}
+                                        </select>
+                                        <input 
+                                            type="number" min="1" placeholder="Qty"
+                                            style={{ flex: 1, padding: '12px', borderRadius: '12px', border: '1.5px solid #e2e8f0' }}
+                                            value={item.quantity}
+                                            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                ))}
+                                <button type="button" onClick={addItemField} className="edit-btn" style={{ width: '100%', padding: '10px' }}>
+                                    + Add Line Item
+                                </button>
+                            </div>
                         </div>
 
-                        <div style={{ marginBottom: '15px' }}>
-                            <label>Order Items:</label>
-                            {formData.items.map((item, index) => (
-                                <div key={index} style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                                    <select 
-                                        style={{ flex: 2, padding: '10px' }}
-                                        value={item.product}
-                                        onChange={(e) => handleItemChange(index, 'product', e.target.value)}
-                                        required
-                                    >
-                                        <option value="">-- Select Product --</option>
-                                        {products.map(p => <option key={p.id} value={p.id}>{p.name} ({p.unit_price} EGP)</option>)}
-                                    </select>
-                                    <input 
-                                        type="number" 
-                                        min="1" 
-                                        style={{ flex: 1, padding: '10px' }}
-                                        value={item.quantity}
-                                        onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                                        required
-                                    />
-                                </div>
-                            ))}
-                            <button type="button" onClick={addItemField} style={{ marginTop: '10px', background: '#eee', border: '1px solid #ccc', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer' }}>
-                                + Add Another Product
-                            </button>
-                        </div>
-
-                        <button type="submit" style={{ background: '#27ae60', color: 'white', border: 'none', padding: '12px 25px', borderRadius: '8px', cursor: 'pointer', width: '100%', fontWeight: 'bold' }}>
-                            Submit Purchase Order
+                        <button type="submit" style={{ width: '100%', marginTop: '20px', padding: '15px' }}>
+                            Confirm & Submit Order
                         </button>
                     </form>
                 </div>
             )}
 
-            {/* --- عرض الأوردرات --- */}
-            {orders.length === 0 ? (
-                <p>No purchase orders found.</p>
-            ) : (
-                <div className="orders-list">
-                    {orders.map(order => (
-                        <div key={order.id} style={{ background: '#fff', border: '1px solid #ddd', borderRadius: '12px', marginBottom: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-                            <div style={{ background: '#f8f9fa', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee' }}>
+            {/* 3. قائمة الطلبات بنظام الكروت */}
+            <div className="orders-grid">
+                {orders.length === 0 ? (
+                    <div className="page-content" style={{textAlign:'center'}}>No active orders found.</div>
+                ) : (
+                    orders.map(order => (
+                        <div key={order.id} className="page-content" style={{ padding: '0', overflow: 'hidden', marginBottom: '30px', border: '1px solid rgba(13, 17, 100, 0.1)' }}>
+                            {/* كارت الهيدر */}
+                            <div style={{ background: 'rgba(13, 17, 100, 0.03)', padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
-                                    <span style={{ marginRight: '15px' }}><strong>Order:</strong> #{order.order_number}</span>
-                                    <span style={{ marginRight: '15px' }}><strong>Officer:</strong> {order.requesting_officer_name}</span>
-                                    <span><strong>Supplier:</strong> {order.supplier_name}</span>
+                                    <h4 style={{ margin: 0, color: 'var(--color-1)' }}>PO #{order.order_number}</h4>
+                                    <small style={{ color: 'var(--text-muted)' }}>By: {order.requesting_officer_name} | To: {order.supplier_name}</small>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                    <span style={{ padding: '5px 12px', borderRadius: '20px', fontSize: '12px', backgroundColor: order.status === 'approved' ? '#d4edda' : '#fff3cd', color: order.status === 'approved' ? '#155724' : '#856404' }}>
+                                    <span className={`badge ${order.status}`} style={{
+                                        background: order.status === 'approved' ? '#dcfce7' : '#fef9c3',
+                                        color: order.status === 'approved' ? '#15803d' : '#a16207',
+                                        padding: '6px 15px', borderRadius: '10px', fontSize: '11px', fontWeight: 'bold'
+                                    }}>
                                         {order.status.toUpperCase()}
                                     </span>
                                     {order.status === 'pending' && (
-                                        <button onClick={() => handleApprove(order.id)} style={{ backgroundColor: '#28a745', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
+                                        <button onClick={() => handleApprove(order.id)} style={{ background: 'var(--color-1)', padding: '6px 12px', fontSize: '12px' }}>
                                             Approve
                                         </button>
                                     )}
                                 </div>
                             </div>
 
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead style={{ background: '#fafafa' }}>
-                                    <tr style={{ textAlign: 'left', fontSize: '13px', color: '#777' }}>
-                                        <th style={{ padding: '12px' }}>Product Name</th>
-                                        <th>Quantity</th>
-                                        <th>Unit Price</th>
-                                        <th>Subtotal</th>
+                            {/* جدول المنتجات داخل الطلب */}
+                            <table className="dash-table" style={{ margin: '0', width: '100%' }}>
+                                <thead>
+                                    <tr>
+                                        <th style={{ paddingLeft: '20px' }}>Product</th>
+                                        <th>Qty</th>
+                                        <th>Price</th>
+                                        <th style={{ paddingRight: '20px' }}>Subtotal</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {order.items && order.items.map(item => (
-                                        <tr key={item.id} style={{ borderBottom: '1px solid #f1f1f1' }}>
-                                            <td style={{ padding: '12px' }}>{item.product_name}</td>
+                                        <tr key={item.id}>
+                                            <td style={{ paddingLeft: '20px' }}>{item.product_name}</td>
                                             <td>{item.quantity}</td>
-                                            <td>{item.unit_price} EGP</td>
-                                            <td><strong>{(item.quantity * item.unit_price).toFixed(2)} EGP</strong></td>
+                                            <td>{parseFloat(item.unit_price).toLocaleString()} EGP</td>
+                                            <td style={{ paddingRight: '20px' }}><strong>{(item.quantity * item.unit_price).toLocaleString()} EGP</strong></td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
-                            <div style={{ padding: '15px', textAlign: 'right', background: '#fff' }}>
-                                <span style={{ fontSize: '18px' }}>Total: <strong style={{ color: '#853953' }}>{order.total_amount} EGP</strong></span>
+
+                            {/* فوتر الكارت */}
+                            <div style={{ padding: '20px', textAlign: 'right', borderTop: '1.5px solid #f1f5f9' }}>
+                                <span style={{ color: 'var(--text-muted)', marginRight: '10px' }}>Order Total:</span>
+                                <strong style={{ fontSize: '1.4rem', color: 'var(--color-1)' }}>{parseFloat(order.total_amount).toLocaleString()} EGP</strong>
                             </div>
                         </div>
-                    ))}
-                </div>
-            )}
+                    ))
+                )}
+            </div>
         </div>
     );
 };

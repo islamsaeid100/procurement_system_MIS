@@ -5,6 +5,7 @@ const Suppliers = () => {
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         contact_person: '',
@@ -35,10 +36,10 @@ const Suppliers = () => {
                 alert("Supplier Registered Successfully!");
                 fetchSuppliers();
                 setFormData({ name: '', contact_person: '', email: '', phone: '', address: '' });
+                setShowForm(false);
             })
             .catch(err => {
-                console.error("Post Error:", err.response?.data);
-                alert("Error adding supplier.");
+                alert("Error adding supplier. Check your connection.");
             });
     };
 
@@ -51,61 +52,94 @@ const Suppliers = () => {
         (sup.contact_person?.toLowerCase() || "").includes(searchTerm.toLowerCase())
     );
 
-    if (loading) return <div className="page-content">Connecting to Database...</div>;
+    if (loading) return <div className="page-content" style={{textAlign:'center', padding:'50px'}}>Connecting to Directory...</div>;
 
     return (
-        <div className="page-content">
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '2px solid #2c3e50', paddingBottom: '10px' }}>
-                <h2 style={{margin: 0, color: '#853953'}}>Suppliers Directory</h2>
-                <div style={{ color: '#7f8c8d' }}>Total: {suppliers.length} Records</div>
+        <div className="suppliers-page">
+            {/* 1. هيدر الموردين المطور */}
+            <header className="page-content" style={{ marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h2 style={{ color: 'var(--color-1)', margin: 0 }}>Suppliers Directory</h2>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>Total: {suppliers.length} Registered Vendors</p>
+                </div>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    <input 
+                        type="text" 
+                        placeholder="🔍 Quick Search..." 
+                        style={{ padding: '10px 15px', borderRadius: '12px', border: '1.5px solid #e2e8f0', width: '250px' }}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        value={searchTerm}
+                    />
+                    <button onClick={() => setShowForm(!showForm)} style={{ background: showForm ? 'var(--text-muted)' : 'linear-gradient(90deg, var(--color-2), var(--color-3))' }}>
+                        {showForm ? 'Cancel' : '+ New Vendor'}
+                    </button>
+                </div>
             </header>
 
-            <section style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', marginBottom: '30px' }}>
-                <h3 style={{marginTop: 0}}>Register New Vendor</h3>
-                <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
-                    <input name="name" placeholder="Company Name" value={formData.name} onChange={handleChange} required />
-                    <input name="contact_person" placeholder="Contact Person" value={formData.contact_person} onChange={handleChange} required />
-                    <input name="email" type="email" placeholder="Business Email" value={formData.email} onChange={handleChange} required />
-                    <input name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} required />
-                    <input name="address" placeholder="Full Address" value={formData.address} onChange={handleChange} style={{gridColumn: 'span 2'}} required />
-                    <button type="submit" style={{ background: '#853953', color: 'white', border: 'none', padding: '10px', borderRadius: '4px', cursor: 'pointer' }}>
-                        + Add Supplier
-                    </button>
-                </form>
-            </section>
+            {/* 2. فورم إضافة مورد (Glassmorphism) */}
+            {showForm && (
+                <div className="page-content" style={{ marginBottom: '30px', animation: 'slideUp 0.4s ease' }}>
+                    <h3 style={{ color: 'var(--color-1)', marginTop: 0 }}>Register New Partner</h3>
+                    <form onSubmit={handleSubmit}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+                            <div className="input-group">
+                                <label>Company Name</label>
+                                <input name="name" placeholder="e.g. Tech Solutions Inc." value={formData.name} onChange={handleChange} required />
+                            </div>
+                            <div className="input-group">
+                                <label>Contact Person</label>
+                                <input name="contact_person" placeholder="Name of representative" value={formData.contact_person} onChange={handleChange} required />
+                            </div>
+                            <div className="input-group">
+                                <label>Email Address</label>
+                                <input name="email" type="email" placeholder="vendor@example.com" value={formData.email} onChange={handleChange} required />
+                            </div>
+                            <div className="input-group">
+                                <label>Phone Number</label>
+                                <input name="phone" placeholder="+20 123 456 789" value={formData.phone} onChange={handleChange} required />
+                            </div>
+                            <div className="input-group" style={{ gridColumn: 'span 2' }}>
+                                <label>Office Address</label>
+                                <input name="address" placeholder="Building, Street, City" value={formData.address} onChange={handleChange} required />
+                            </div>
+                            <button type="submit" style={{ gridColumn: '1 / -1', padding: '15px', marginTop: '10px' }}>
+                                Confirm Registration
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            )}
 
-            <div style={{ marginBottom: '20px' }}>
-                <input 
-                    type="text" 
-                    placeholder="Search Suppliers..." 
-                    style={{ width: '100%', padding: '12px', borderRadius: '5px', border: '1px solid #ccc' }}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    value={searchTerm}
-                />
-            </div>
-
-            <table className="styled-table">
-                <thead>
-                    <tr>
-                        <th>Company Name</th>
-                        <th>Contact Person</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Address</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredSuppliers.map(sup => (
-                        <tr key={sup.id}>
-                            <td><strong>{sup.name}</strong></td>
-                            <td>{sup.contact_person}</td>
-                            <td>{sup.email}</td>
-                            <td>{sup.phone}</td>
-                            <td>{sup.address}</td>
+            {/* 3. جدول الموردين المطور */}
+            <div className="dash-table-container">
+                <table className="dash-table">
+                    <thead>
+                        <tr>
+                            <th>Partner Info</th>
+                            <th>Contact Person</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Location</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {filteredSuppliers.length > 0 ? filteredSuppliers.map(sup => (
+                            <tr key={sup.id}>
+                                <td>
+                                    <div style={{fontWeight: '700', color: 'var(--color-1)'}}>{sup.name}</div>
+                                    <div style={{fontSize: '10px', color: 'var(--color-3)', letterSpacing: '1px'}}>VERIFIED VENDOR</div>
+                                </td>
+                                <td>{sup.contact_person}</td>
+                                <td><a href={`mailto:${sup.email}`} style={{textDecoration:'none', color:'var(--color-2)'}}>{sup.email}</a></td>
+                                <td>{sup.phone}</td>
+                                <td style={{fontSize: '0.85rem', color: 'var(--text-muted)'}}>{sup.address}</td>
+                            </tr>
+                        )) : (
+                            <tr><td colSpan="5" style={{textAlign:'center', padding:'30px'}}>No suppliers match your search.</td></tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

@@ -4,7 +4,6 @@ import api from '../services/api';
 const Invoices = () => {
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
-    // حقول التاريخ للتقارير المجمعة
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
 
@@ -24,169 +23,133 @@ const Invoices = () => {
         }
     };
 
-    // 1. وظيفة البحث المجمع بالفترة الزمنية
     const handleFilter = (e) => {
         e.preventDefault();
         fetchInvoices({ start_date: startDate, end_date: endDate });
     };
 
-    // 2. وظيفة طباعة فاتورة واحدة (بكل التفاصيل)
     const printSingleInvoice = (inv) => {
-        // تأكد إن فيه بيانات أصلاً قبل ما تفتح النافذة
         if (!inv.order_details) {
-            alert("عفواً، لا توجد تفاصيل لهذا الطلب بعد. تأكد من الموافقة على الأوردر أولاً.");
+            alert("This order has no details yet.");
             return;
         }
-    
         const printWindow = window.open('', '_blank');
-        
-        // تجهيز قائمة المنتجات بأمان
         const itemsHtml = inv.order_details.items ? inv.order_details.items.map(item => `
             <tr>
-                <td>${item.product_name || 'N/A'}</td>
-                <td>${item.quantity}</td>
-                <td>${item.unit_price} EGP</td>
-                <td>${(item.quantity * item.unit_price).toFixed(2)} EGP</td>
+                <td style="padding:15px; border-bottom:1px solid #f1f5f9;">${item.product_name}</td>
+                <td style="padding:15px; border-bottom:1px solid #f1f5f9;">${item.quantity}</td>
+                <td style="padding:15px; border-bottom:1px solid #f1f5f9;">${item.unit_price} EGP</td>
+                <td style="padding:15px; border-bottom:1px solid #f1f5f9; font-weight:bold; color:#0D1164;">${(item.quantity * item.unit_price).toFixed(2)} EGP</td>
             </tr>
-        `).join('') : '<tr><td colspan="4">No items found</td></tr>';
-    
+        `).join('') : '';
+
         printWindow.document.write(`
             <html>
                 <head>
-                    <title>Invoice - ${inv.invoice_number}</title>
+                    <title>Invoice ${inv.invoice_number}</title>
                     <style>
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; line-height: 1.6; direction: rtl; }
-                        .header { text-align: center; border-bottom: 3px solid #853953; padding-bottom: 10px; margin-bottom: 20px; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-                        th { background-color: #f8f9fa; }
-                        .footer { text-align: left; margin-top: 30px; font-size: 1.3em; color: #853953; }
+                        body { font-family: 'Inter', sans-serif; color: #1e293b; padding: 50px; }
+                        .container { max-width: 800px; margin: auto; border: 1px solid #e2e8f0; padding: 40px; border-radius: 24px; }
+                        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #0D1164; padding-bottom: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+                        th { text-align: left; background: #f8fafc; padding: 12px; color: #64748b; font-size: 12px; }
+                        .total { margin-top: 30px; text-align: right; font-size: 22px; font-weight: bold; color: #0D1164; }
                     </style>
                 </head>
                 <body>
-                    <div class="header">
-                        <h1>فاتورة شراء</h1>
-                        <p>رقم الفاتورة: ${inv.invoice_number}</p>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <div>
-                            <p><strong>بواسطة الموظف:</strong> ${inv.order_details.requesting_officer_name || 'غير محدد'}</p>
-                            <p><strong>رقم الطلب الأصلي:</strong> ${inv.order_number || inv.order}</p>
+                    <div class="container">
+                        <div class="header">
+                            <h2>PMS SYSTEM</h2>
+                            <div style="text-align:right">
+                                <h1 style="margin:0; color:#EA2264">INVOICE</h1>
+                                <span># ${inv.invoice_number}</span>
+                            </div>
                         </div>
-                        <div style="text-align: left;">
-                            <p><strong>المورد:</strong> ${inv.order_details.supplier_name || 'غير محدد'}</p>
-                            <p><strong>تاريخ الفاتورة:</strong> ${new Date(inv.issue_date).toLocaleDateString('ar-EG')}</p>
+                        <div style="margin-top:30px; display:grid; grid-template-columns: 1fr 1fr;">
+                            <div><strong>Officer:</strong> ${inv.order_details.requesting_officer_name}</div>
+                            <div style="text-align:right"><strong>Date:</strong> ${new Date(inv.issue_date).toLocaleDateString()}</div>
                         </div>
+                        <table>
+                            <thead><tr><th>Description</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>
+                            <tbody>${itemsHtml}</tbody>
+                        </table>
+                        <div class="total">Total: ${inv.total_amount} EGP</div>
                     </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>المنتج</th>
-                                <th>الكمية</th>
-                                <th>سعر الوحدة</th>
-                                <th>الإجمالي الفرعي</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHtml}
-                        </tbody>
-                    </table>
-                    <div class="footer">
-                        <strong>الإجمالي الكلي: ${inv.total_amount} EGP</strong>
-                    </div>
-                    <script>
-                        window.onload = function() { window.print(); window.close(); };
-                        <script>
-                        window.onload = function() {
-                            setTimeout(function() {
-                                window.print();
-                            }, 500); 
-                        };
-                    </script>
+                    <script>window.onload = function() { setTimeout(() => { window.print(); window.close(); }, 500); }</script>
                 </body>
             </html>
         `);
         printWindow.document.close();
     };
 
-    // 3. حساب الإجمالي الكلي للتقرير
     const totalSum = invoices.reduce((acc, inv) => acc + parseFloat(inv.total_amount), 0);
 
-    if (loading) return <div className="page-content">Generating Financial Report...</div>;
+    if (loading) return <div className="container" style={{textAlign:'center', marginTop:'100px'}}>Loading...</div>;
 
     return (
-        <div className="page-content">
-            <header className="no-print" style={{ borderBottom: '2px solid #27ae60', marginBottom: '20px' }}>
-                <h2 style={{color: '#27ae60'}}>Financial Invoices & Reporting</h2>
+        <div className="invoice-module">
+            {/* 1. الفلتر والهيدر (مدمج في الثيم) */}
+            <div className="page-content no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+                <div>
+                    <h2 style={{ color: 'var(--color-1)', margin: 0 }}>Financial Invoices</h2>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>Accounting & Reporting</p>
+                </div>
                 
-                {/* فورم الفلترة المجمعة */}
-                <form onSubmit={handleFilter} style={{ display: 'flex', gap: '10px', marginBottom: '15px', alignItems: 'flex-end' }}>
-                    <div>
-                        <label style={{display: 'block', fontSize: '12px'}}>From Date:</label>
-                        <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+                <form onSubmit={handleFilter} style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ display: 'flex', background: 'rgba(0,0,0,0.03)', padding: '5px 15px', borderRadius: '15px', gap: '10px', alignItems: 'center' }}>
+                        <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ border: 'none', background: 'transparent' }} />
+                        <span>→</span>
+                        <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ border: 'none', background: 'transparent' }} />
                     </div>
-                    <div>
-                        <label style={{display: 'block', fontSize: '12px'}}>To Date:</label>
-                        <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
-                    </div>
-                    <button type="submit" style={{background: '#27ae60', color: 'white', padding: '6px 15px', border: 'none', borderRadius: '4px'}}>
-                        Filter Report
-                    </button>
-                    <button onClick={() => window.print()} style={{background: '#2c3e50', color: 'white', padding: '6px 15px', border: 'none', borderRadius: '4px'}}>
-                        Print Current List 🖨️
+                    <button type="submit">Filter</button>
+                    <button type="button" onClick={() => window.print()} className="logout-btn" style={{background: 'var(--color-1)'}}>
+                        <span>⎙</span> Print List
                     </button>
                 </form>
-            </header>
+            </div>
 
-            <div className="printable-area">
-                <h3 className="only-print" style={{display: 'none'}}>Invoices Report Summary</h3>
-                <table className="styled-table" style={{width: '100%'}}>
+            {/* 2. الجدول المالي الرئيسي */}
+            <div className="dash-table-container">
+                <table className="dash-table">
                     <thead>
                         <tr>
-                            <th>Invoice #</th>
+                            <th>Inv #</th>
                             <th>Officer</th>
                             <th>Supplier</th>
+                            <th>Issue Date</th>
                             <th>Amount</th>
-                            <th>Date</th>
                             <th className="no-print">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {invoices.map(inv => (
                             <tr key={inv.id}>
-                                <td>{inv.invoice_number}</td>
+                                <td><span className="badge">{inv.invoice_number}</span></td>
                                 <td>{inv.order_details?.requesting_officer_name}</td>
                                 <td>{inv.order_details?.supplier_name}</td>
-                                <td style={{fontWeight: 'bold', color: '#27ae60'}}>{inv.total_amount} EGP</td>
                                 <td>{new Date(inv.issue_date).toLocaleDateString()}</td>
+                                <td><strong style={{color: 'var(--color-1)'}}>{parseFloat(inv.total_amount).toLocaleString()} EGP</strong></td>
                                 <td className="no-print">
-                                    <button onClick={() => printSingleInvoice(inv)} style={{cursor: 'pointer', background: '#e67e22', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px'}}>
-                                        Print Invoice 📄
+                                    <button 
+                                        onClick={() => printSingleInvoice(inv)} 
+                                        style={{ background: 'transparent', color: 'var(--color-3)', border: '1px solid var(--color-3)', padding: '5px 15px', borderRadius: '10px' }}
+                                    >
+                                        Print 📄
                                     </button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                     <tfoot>
-                        <tr style={{background: '#f9f9f9', fontWeight: 'bold'}}>
-                            <td colSpan="3" style={{textAlign: 'right'}}>Report Total:</td>
-                            <td style={{color: '#27ae60'}}>{totalSum.toFixed(2)} EGP</td>
-                            <td colSpan="2"></td>
+                        <tr>
+                            <td colSpan="4" style={{ textAlign: 'right', padding: '20px', color: 'var(--text-muted)', fontWeight: 'bold' }}>GRAND TOTAL:</td>
+                            <td colSpan="2" style={{ padding: '20px' }}>
+                                <strong style={{ fontSize: '1.3rem', color: 'var(--color-1)' }}>{totalSum.toLocaleString()} EGP</strong>
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
-
-            <style>
-                {`
-                @media print {
-                    .no-print { display: none !important; }
-                    .only-print { display: block !important; text-align: center; }
-                    body { background: white; }
-                    table { border: 1px solid #ddd; }
-                }
-                `}
-            </style>
         </div>
     );
 };

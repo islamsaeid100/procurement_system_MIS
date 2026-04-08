@@ -1,156 +1,207 @@
-/* استدعاء خط حديث من جوجل */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+/* 1. الخطوط والأساسيات */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;700&display=swap');
 
 :root {
-  --bg-light: #F3F4F4;    /* الرمادي الفاتح جداً للخلفية */
-  --primary: #853953;     /* العنابي الفاتح للزراير والتمييز */
-  --secondary: #612D53;   /* العنابي الغامق للـ Hover */
-  --dark: #2C2C2C;        /* الرمادي الغامق جداً للنصوص والـ Sidebar */
+  --color-1: #0D1164; /* كحلي */
+  --color-2: #640D5F; /* بنفسجي */
+  --color-3: #EA2264; /* أحمر وردي */
+  --color-4: #F78D60; /* أورنج */
   --white: #ffffff;
+  --bg-body: #f1f5f9;
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-light);
-  color: var(--dark);
+  font-family: 'Inter', 'Noto Sans Arabic', sans-serif;
+  background-color: var(--bg-body);
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+
+  /* --- الباترن الشبكي القوي (Grid) --- */
+  background-image: 
+    linear-gradient(to right, rgba(13, 17, 100, 0.08) 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, rgba(13, 17, 100, 0.08) 1.5px, transparent 1.5px);
+  background-size: 45px 45px;
 }
 
-/* تصميم الـ Navbar الجانبي (أو العلوي بطابع حديث) */
+/* توهج خلفية ناعم */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at top right, rgba(234, 34, 100, 0.04), transparent 500px),
+              radial-gradient(circle at bottom left, rgba(13, 17, 100, 0.04), transparent 500px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 2. تصميم الـ Navbar (الجريديانت) */
 .navbar {
-  background-color: var(--dark);
-  padding: 1rem 2rem;
+  background: linear-gradient(90deg, var(--color-1) 0%, var(--color-2) 35%, var(--color-3) 70%, var(--color-4) 100%);
+  padding: 0.8rem 2.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   position: sticky;
   top: 0;
   z-index: 1000;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-.logo {
-  color: var(--bg-light);
+.logo-section {
+  color: var(--white);
   font-weight: 700;
-  font-size: 1.5rem;
-  letter-spacing: -1px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
+.logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: brightness(0) invert(1); /* جعل اللوجو أبيض */
+}
+
+/* 3. روابط النافبار والهايلايت التفاعلي */
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 20px;
-  align-items: center;
+  gap: 10px;
   margin: 0;
 }
 
-.nav-links a {
-  color: #bdc3c7;
+.nav-item {
+  color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
   font-weight: 500;
   font-size: 0.95rem;
+  padding: 10px 18px;
+  border-radius: 12px;
+  position: relative;
   transition: all 0.3s ease;
-  padding: 8px 12px;
-  border-radius: 6px;
 }
 
-.nav-links a:hover {
+.nav-item:hover {
   color: var(--white);
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.active-link {
+/* ستايل الصفحة النشطة */
+.nav-item.active {
   color: var(--white) !important;
-  background: var(--primary) !important;
-  box-shadow: 0 4px 10px rgba(133, 57, 83, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
 }
 
-/* تصميم الحاويات والصفحات */
+/* رسم الخط الأبيض تحت الكلمة النشطة */
+.nav-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: 20%;
+  width: 60%;
+  height: 3px;
+  background: var(--white);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { width: 0; left: 50%; }
+  to { width: 60%; left: 20%; }
+}
+
+/* 4. الكروت والجداول (Glassmorphism) */
 .container {
   max-width: 1200px;
-  margin: 40px auto;
+  margin: 35px auto;
   padding: 0 20px;
 }
 
-.page-content {
-  background: var(--white);
+.page-content, .table-section, .dash-table-container {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-  animation: slideUp 0.5s ease-out;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  margin-bottom: 25px;
+  animation: fadeUp 0.5s ease-out;
 }
 
-@keyframes slideUp {
+@keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* الاستايل الحديث للجداول */
-.styled-table {
+/* 5. الجداول الحديثة (Floating Rows) */
+.dash-table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  font-size: 0.9rem;
+  border-collapse: separate;
+  border-spacing: 0 10px;
 }
 
-.styled-table th {
-  background-color: var(--bg-light);
-  color: var(--dark);
-  text-align: left;
+.dash-table th {
+  color: var(--color-1);
   padding: 15px;
-  font-weight: 600;
-  border-bottom: 2px solid #eee;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: 700;
 }
 
-.styled-table td {
-  padding: 15px;
-  border-bottom: 1px solid #f9f9f9;
+.dash-table td {
+  background: var(--white);
+  padding: 16px;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  transition: transform 0.2s;
 }
 
-.styled-table tr:hover {
-  background-color: #fcfcfc;
+.dash-table td:first-child { border-radius: 12px 0 0 12px; border-left: 1px solid #f1f5f9; }
+.dash-table td:last-child { border-radius: 0 12px 12px 0; border-right: 1px solid #f1f5f9; }
+
+.dash-table tr:hover td {
+  background: #fafafa;
+  transform: scale(1.005);
 }
 
-/* الزراير (Buttons) */
+/* 6. الزراير والحقول */
 button {
-  background-color: var(--primary);
+  background: linear-gradient(135deg, var(--color-2), var(--color-3));
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 25px;
+  border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.3s all;
+  transition: 0.3s;
+  box-shadow: 0 4px 15px rgba(234, 34, 100, 0.2);
 }
 
 button:hover {
-  background-color: var(--secondary);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(234, 34, 100, 0.3);
 }
 
-/* الحقول (Inputs) */
-input, select, textarea {
-  border: 1px solid #ddd;
-  padding: 12px;
-  border-radius: 8px;
-  outline: none;
-  transition: 0.3s;
+.logout-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 18px;
 }
 
-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(133, 57, 83, 0.1);
+.logout-btn:hover {
+  background: var(--color-3);
+  border-color: var(--color-3);
 }
 
-/* كروت الداشبورد */
-.stats-card {
-  border-radius: 12px;
-  padding: 25px;
-  color: white;
-  transition: transform 0.3s;
-}
-
-.stats-card:hover {
-  transform: scale(1.02);
+/* إعدادات الطباعة */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; background-image: none !important; }
+  .page-content { box-shadow: none; border: 1px solid #ddd; }
 }
