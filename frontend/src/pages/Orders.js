@@ -46,14 +46,31 @@ const Orders = () => {
     // --- وظيفة إضافة أوردر جديد ---
     const handleCreateOrder = async (e) => {
         e.preventDefault();
+        
+        // تجهيز البيانات بالشكل اللي الـ Serializer الجديد مستنيه
+        const orderData = {
+            supplier: parseInt(formData.supplier), // تحويل الـ ID لرقم
+            items: formData.items.map(item => ({
+                product: parseInt(item.product), // تأكد إن الـ ID رقم
+                quantity: parseInt(item.quantity)
+            }))
+        };
+    
+        console.log("Sending Data:", orderData); // عشان تشوف البيانات في الـ Console قبل ما تتبعت
+    
         try {
-            await api.post('orders/', formData);
-            alert("تم إنشاء طلب الشراء بنجاح!");
+            const res = await api.post('orders/', orderData);
+            alert("تم إنشاء طلب الشراء بنجاح! رقم الطلب: " + res.data.order_number);
             setShowAddForm(false);
             setFormData({ supplier: '', items: [{ product: '', quantity: 1 }] });
-            fetchOrders();
+            fetchOrders(); // تحديث القائمة
         } catch (err) {
-            alert("خطأ في الإضافة: " + JSON.stringify(err.response?.data));
+            console.error("Full Error Object:", err);
+            // عرض الخطأ بشكل أوضح بدل كلمة undefined
+            const errorMsg = err.response?.data 
+                ? JSON.stringify(err.response.data) 
+                : "حدث خطأ غير متوقع في الاتصال بالسيرفر";
+            alert("خطأ في الإضافة: " + errorMsg);
         }
     };
 
