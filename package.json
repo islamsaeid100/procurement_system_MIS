@@ -1,20 +1,12 @@
 {
-  "dependencies": {
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
-  }
-}
-"scripts": {
-  "start": "node index.js" 
-}
-{
   "name": "procurement_system_mis",
   "version": "1.0.0",
   "scripts": {
-    "start": "node app.js",  // تأكد إن السطر ده موجود والاسم صح
-    "build": "yarn install"
+    "start": "node index.js",
+    "build": "npm install"
   },
   "dependencies": {
-    ...
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   }
 }
