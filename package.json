@@ -4,3 +4,15 @@
     "react-dom": "^19.2.4"
   }
 }
+
+{
+  "name": "procurement_system_mis",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node app.js",  // تأكد إن السطر ده موجود والاسم صح
+    "build": "yarn install"
+  },
+  "dependencies": {
+    ...
+  }
+}

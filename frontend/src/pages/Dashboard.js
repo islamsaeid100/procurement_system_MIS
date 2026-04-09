@@ -55,8 +55,8 @@ const Dashboard = () => {
     if (loading) return <div className="page-content" style={{textAlign: 'center', padding: '50px'}}>Loading Analytics...</div>;
 
     const totalSales = filteredData.invoices.reduce((acc, inv) => acc + parseFloat(inv.total_amount), 0);
+    const totalStockItems = data.products.reduce((acc, p) => acc + (p.stock_quantity || 0), 0);
     
-    // ألوان هادئة ومريحة للرسوم البيانية (Muted Palette)
     const chartColors = ['#4e54c8', '#a445b2', '#ff4b5c', '#f78d60'];
 
     const barData = {
@@ -83,7 +83,7 @@ const Dashboard = () => {
             }}>
                 <div style={{color: '#0D1164'}}>
                     <h2 style={{margin: 0, fontSize: '1.5rem'}}>Analytics Dashboard</h2>
-                    <p style={{margin: 0, fontSize: '0.8rem', opacity: 0.6}}>Overview of your procurement performance</p>
+                    <p style={{margin: 0, fontSize: '0.8rem', opacity: 0.6}}>Inventory & Performance Tracking</p>
                 </div>
                 
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -100,7 +100,7 @@ const Dashboard = () => {
                 </div>
             </header>
 
-            {/* 2. كروت الإحصائيات (تباين عالي وكيرفات ناعمة) */}
+            {/* 2. كروت الإحصائيات (معدلة لتشمل إجمالي القطع في المخزن) */}
             <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
                 <div className="stat-card" style={{ 
                     flex: 1, 
@@ -120,8 +120,8 @@ const Dashboard = () => {
                     borderRadius: '24px',
                     padding: '25px' 
                 }}>
-                    <p style={{fontSize: '0.9rem', opacity: 0.8, margin: 0}}>Total Orders</p>
-                    <h2 style={{fontSize: '2rem', margin: '10px 0'}}>{filteredData.orders.length}</h2>
+                    <p style={{fontSize: '0.9rem', opacity: 0.8, margin: 0}}>Current Stock</p>
+                    <h2 style={{fontSize: '2rem', margin: '10px 0'}}>{totalStockItems.toLocaleString()} <span style={{fontSize: '1rem'}}>Units</span></h2>
                 </div>
 
                 <div className="stat-card" style={{ 
@@ -132,8 +132,8 @@ const Dashboard = () => {
                     padding: '25px',
                     border: '1px solid rgba(13, 17, 100, 0.1)'
                 }}>
-                    <p style={{fontSize: '0.9rem', opacity: 0.6, margin: 0}}>Active Products</p>
-                    <h2 style={{fontSize: '2rem', margin: '10px 0'}}>{data.products.length}</h2>
+                    <p style={{fontSize: '0.9rem', opacity: 0.6, margin: 0}}>Total Orders</p>
+                    <h2 style={{fontSize: '2rem', margin: '10px 0'}}>{filteredData.orders.length}</h2>
                 </div>
             </div>
 
@@ -149,17 +149,17 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* 4. الجداول */}
+            {/* 4. الجداول المطورة (Inventory Activity) */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px' }}>
                 <div className="dash-table-container" style={{borderRadius: '24px'}}>
-                    <h4 style={{color: '#640D5F', paddingLeft: '10px'}}>Recent Suppliers</h4>
+                    <h4 style={{color: '#640D5F', padding: '10px 20px', margin: 0}}>Top Suppliers</h4>
                     <table className="dash-table">
-                        <thead><tr><th>Supplier Name</th><th>Activity</th></tr></thead>
+                        <thead><tr><th>Supplier Name</th><th>Total Activity</th></tr></thead>
                         <tbody>
                             {data.suppliers.slice(0, 5).map(s => (
                                 <tr key={s.id}>
                                     <td><strong>{s.name}</strong></td>
-                                    <td><span className="badge" style={{background: '#f1f5f9', color: '#0D1164'}}>{filteredData.orders.filter(o => o.supplier === s.id).length} Orders</span></td>
+                                    <td><span className="badge" style={{background: '#f1f5f9', color: '#0D1164'}}>{data.orders.filter(o => o.supplier === s.id).length} Orders</span></td>
                                 </tr>
                             ))}
                         </tbody>
@@ -167,16 +167,32 @@ const Dashboard = () => {
                 </div>
 
                 <div className="dash-table-container" style={{borderRadius: '24px'}}>
-                    <h4 style={{color: '#EA2264', paddingLeft: '10px'}}>Inventory Snapshot</h4>
+                    <h4 style={{color: '#EA2264', padding: '10px 20px', margin: 0}}>Stock Status & Outflow</h4>
                     <table className="dash-table">
-                        <thead><tr><th>Product</th><th>Stock</th></tr></thead>
+                        <thead><tr><th>Product</th><th>Status</th><th>Inventory Bar</th></tr></thead>
                         <tbody>
-                            {data.products.slice(0, 5).map(p => (
-                                <tr key={p.id}>
-                                    <td><strong>{p.name}</strong></td>
-                                    <td><span style={{color: p.stock_quantity < 10 ? '#ff4b5c' : '#2ecc71', fontWeight: 'bold'}}>{p.stock_quantity} units</span></td>
-                                </tr>
-                            ))}
+                            {data.products.slice(0, 5).map(p => {
+                                const isLow = p.stock_quantity < 10;
+                                return (
+                                    <tr key={p.id}>
+                                        <td><strong>{p.name}</strong></td>
+                                        <td>
+                                            <span style={{color: isLow ? '#ff4b5c' : '#2ecc71', fontWeight: 'bold'}}>
+                                                {p.stock_quantity} units
+                                            </span>
+                                        </td>
+                                        <td style={{ width: '120px' }}>
+                                            <div style={{ width: '100%', background: '#f1f5f9', height: '6px', borderRadius: '10px', overflow: 'hidden' }}>
+                                                <div style={{ 
+                                                    width: `${Math.min((p.stock_quantity / 50) * 100, 100)}%`, 
+                                                    background: isLow ? '#ff4b5c' : '#a445b2',
+                                                    height: '100%' 
+                                                }}></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
