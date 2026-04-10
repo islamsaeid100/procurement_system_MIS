@@ -64,3 +64,31 @@ class Invoice(models.Model):
     due_date = models.DateField()
     is_paid = models.BooleanField(default=False)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
+
+    # backend/models.py (مثال)
+
+class StockMovement(models.Model):
+    MOVEMENT_TYPES = (
+        ('IN', 'إضافة للمخزن'),
+        ('OUT', 'صرف من المخزن'),
+    )
+    
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='movements')
+    quantity = models.PositiveIntegerField()
+    movement_type = models.CharField(max_length=3, choices=MOVEMENT_TYPES)
+    notes = models.TextField(blank=True, null=True) # مثلاً: صرف لمشروع كذا
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        # السحر هنا: تحديث استوك المنتج أوتوماتيك عند الحفظ
+        product = self.product
+        if self.movement_type == 'OUT':
+            if product.stock_quantity >= self.quantity:
+                product.stock_quantity -= self.quantity
+            else:
+                raise ValueError("الكمية المطلوبة أكبر من المتاحة في المخزن!")
+        else:
+            product.stock_quantity += self.quantity
+        
+        product.save()
+        super().save(*args, **kwargs)

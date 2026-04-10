@@ -205,3 +205,103 @@ button:hover {
   body { background: white !important; background-image: none !important; }
   .page-content { box-shadow: none; border: 1px solid #ddd; }
 }
+/* تنسيق زرار الخروج المطور */
+.navbar-logout-btn {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  padding: 8px 18px !important;
+  border-radius: 12px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+/* الأيقونة الـ SVG */
+.logout-icon-svg {
+  transition: transform 0.3s ease;
+  stroke: #ffffff; /* لون الأيقونة أبيض ناصع */
+}
+
+.navbar-logout-btn:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  transform: translateY(-2px);
+}
+
+/* حركة السهم عند الـ Hover */
+.navbar-logout-btn:hover .logout-icon-svg {
+  transform: translateX(4px);
+}
+
+/* تأكد إن الـ Navbar نفسه واخد الجريديانت والـ Padding صح */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
+}
+
+/* --- وزن منطقة البراند --- */
+.brand-container {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* المسافة الموزونة بين اللوجو والاسم */
+  padding-left: 10px;
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1); /* خلفية خفيفة جداً للوجو */
+  padding: 6px;
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.navbar-logo {
+  width: 35px;
+  height: 35px;
+  object-fit: contain;
+  /* لو اللوجو ألوانه مش ماشية مع الجريديانت، فعل السطر اللي جاي عشان تخليه أبيض ناصع */
+  /* filter: brightness(0) invert(1); */
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.main-name {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.sub-name {
+  color: var(--color-4); /* لون الأورنج الفاتح من الجريديانت بتاعك */
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-top: 4px;
+  opacity: 0.9;
+}
+
+/* --- ضبط توازن النافبار بالكامل --- */
+.navbar {
+  padding: 0 45px !important; /* زيادة المساحة الجانبية للوزن */
+  height: 75px; /* ارتفاع ثابت ومريح للعين */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
