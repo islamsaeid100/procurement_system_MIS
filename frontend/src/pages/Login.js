@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. استيراد useNavigate
 import api from '../services/api';
 import logo from '../components/logo.png'; 
 
 const Login = () => {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
+    const navigate = useNavigate(); // 2. تعريف الـ navigate
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -11,7 +13,13 @@ const Login = () => {
             const res = await api.post('token/', credentials);
             localStorage.setItem('access_token', res.data.access);
             localStorage.setItem('refresh_token', res.data.refresh);
-            window.location.href = '/';
+            
+            // 3. التعديل الجوهري: نستخدم navigate بدلاً من window.location
+            // ده هيخليك جوه المشروع ويحولك للداشبورد (#/) بسلاسة
+            navigate('/'); 
+            
+            // عمل تحديث بسيط للحالة لو الأبلكيشن محتاج يحس بالتوكن الجديد
+            window.location.reload(); 
         } catch (err) {
             alert("Username or Password incorrect. Please try again.");
         }
@@ -19,7 +27,6 @@ const Login = () => {
 
     return (
         <div className="login-wrapper">
-            {/* الكارت الزجاجي */}
             <form onSubmit={handleSubmit} className="page-content login-card">
                 <div style={{ textAlign: 'center', marginBottom: '30px' }}>
                     <img src={logo} alt="Logo" className="login-logo" />
@@ -32,6 +39,7 @@ const Login = () => {
                     <input 
                         type="text" 
                         placeholder="Enter your username" 
+                        value={credentials.username}
                         onChange={e => setCredentials({...credentials, username: e.target.value})}
                         required 
                     />
@@ -42,6 +50,7 @@ const Login = () => {
                     <input 
                         type="password" 
                         placeholder="••••••••" 
+                        value={credentials.password}
                         onChange={e => setCredentials({...credentials, password: e.target.value})}
                         required 
                     />
@@ -62,26 +71,22 @@ const Login = () => {
                     height: 100vh;
                     align-items: center;
                     justify-content: center;
-                    /* الخلفية والباترن هييجوا أوتوماتيك من App.css لأننا شيلنا الستايل اليدوي */
                 }
-
                 .login-card {
                     width: 100%;
                     max-width: 420px;
                     padding: 50px !important;
                     border-radius: 30px !important;
                     box-shadow: 0 20px 40px rgba(13, 17, 100, 0.1) !important;
+                    background: white; /* تأكيد اللون */
                 }
-
                 .login-logo {
                     width: 80px;
                     height: 80px;
                     object-fit: contain;
                     margin-bottom: 15px;
-                    /* فلتر خفيف عشان اللوجو يبرز */
                     filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
                 }
-
                 .input-group-login label {
                     display: block;
                     font-size: 0.85rem;
@@ -90,7 +95,6 @@ const Login = () => {
                     margin-bottom: 8px;
                     margin-left: 5px;
                 }
-
                 .input-group-login input {
                     width: 100%;
                     padding: 14px;
@@ -100,24 +104,24 @@ const Login = () => {
                     box-sizing: border-box;
                     transition: all 0.3s ease;
                 }
-
                 .input-group-login input:focus {
                     border-color: var(--color-3);
                     background: #fff;
                     box-shadow: 0 0 0 4px rgba(234, 34, 100, 0.1);
                     outline: none;
                 }
-
                 .login-submit-btn {
                     width: 100%;
                     margin-top: 30px;
                     padding: 15px !important;
                     font-size: 1rem;
+                    color: white;
+                    border: none;
+                    cursor: pointer;
                     background: linear-gradient(90deg, var(--color-1), var(--color-2)) !important;
                     border-radius: 15px !important;
-                    letter-spacing: 0.5px;
+                    transition: all 0.3s ease;
                 }
-
                 .login-submit-btn:hover {
                     transform: translateY(-3px);
                     box-shadow: 0 10px 20px rgba(13, 17, 100, 0.2) !important;

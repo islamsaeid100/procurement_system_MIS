@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // ضيفنا useState و useEffect
+import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
@@ -11,58 +11,45 @@ import Invoices from './pages/Invoices';
 import Login from './pages/Login';
 
 function App() {
-  // استخدام State عشان الأبلكيشن يحس بتغيير تسجيل الدخول فوراً
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('access_token'));
 
-  // دي وظيفتها تراقب الـ localStorage لو حصل فيه تغيير
+  // تحديث الحالة لو حصل تغيير (للاحتياط)
   useEffect(() => {
-    const checkAuth = () => {
+    const handleAuthChange = () => {
       setIsAuthenticated(!!localStorage.getItem('access_token'));
     };
-    
-    // بنسمع لأي تغيير يحصل في الـ Storage (زي اللوج إن واللوج أوت)
-    window.addEventListener('storage', checkAuth);
-    return () => window.removeEventListener('storage', checkAuth);
+    window.addEventListener('storage', handleAuthChange);
+    return () => window.removeEventListener('storage', handleAuthChange);
   }, []);
 
   return (
     <Router>
       <div className="main-wrapper">
-        <Routes>
-          {/* حالة عدم تسجيل الدخول */}
-          {!isAuthenticated ? (
-            <>
-              <Route path="/login" element={<Login />} />
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </>
-          ) : (
-            /* حالة تسجيل الدخول */
-            <>
-              <Route
-                path="*"
-                element={
-                  <>
-                    <Navbar />
-                    <div className="container">
-                      <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route path="/suppliers" element={<Suppliers />} />
-                        <Route path="/products" element={<Products />} />
-                        <Route path="/orders" element={<Orders />} />
-                        <Route path="/invoices" element={<Invoices />} />
-                        <Route path="/login" element={<Navigate to="/" replace />} />
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                      </Routes>
-                    </div>
-                    <footer className="no-print" style={{ textAlign: 'center', padding: '20px', color: '#95a5a6', fontSize: '0.9em' }}>
-                        © 2026 Procurement Management System | Welcome, Islam
-                    </footer>
-                  </>
-                }
-              />
-            </>
-          )}
-        </Routes>
+        {/* النجمة هنا تعني أن الـ Navbar يظهر فقط لو مسجل دخول */}
+        {isAuthenticated && <Navbar />}
+        
+        <div className={isAuthenticated ? "container" : "auth-container"}>
+          <Routes>
+            {/* المسارات العامة */}
+            <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" replace />} />
+
+            {/* المسارات المحمية */}
+            <Route path="/" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />} />
+            <Route path="/suppliers" element={isAuthenticated ? <Suppliers /> : <Navigate to="/login" replace />} />
+            <Route path="/products" element={isAuthenticated ? <Products /> : <Navigate to="/login" replace />} />
+            <Route path="/orders" element={isAuthenticated ? <Orders /> : <Navigate to="/login" replace />} />
+            <Route path="/invoices" element={isAuthenticated ? <Invoices /> : <Navigate to="/login" replace />} />
+
+            {/* أي مسار غير معروف */}
+            <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} replace />} />
+          </Routes>
+        </div>
+
+        {isAuthenticated && (
+          <footer className="no-print" style={{ textAlign: 'center', padding: '20px', color: '#95a5a6', fontSize: '0.9em' }}>
+              © 2026 Procurement Management System | Welcome, Islam
+          </footer>
+        )}
       </div>
     </Router>
   );
