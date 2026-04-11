@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/procurement_system_MIS/static/css/main.d5c6cb31.css",
-    "main.js": "/procurement_system_MIS/static/js/main.9fd22fa0.js",
+    "main.js": "/procurement_system_MIS/static/js/main.204cdb60.js",
     "static/js/453.825386d9.chunk.js": "/procurement_system_MIS/static/js/453.825386d9.chunk.js",
     "static/media/logo.png": "/procurement_system_MIS/static/media/logo.abe592ba79d4fb499905.png",
     "index.html": "/procurement_system_MIS/index.html",
     "main.d5c6cb31.css.map": "/procurement_system_MIS/static/css/main.d5c6cb31.css.map",
-    "main.9fd22fa0.js.map": "/procurement_system_MIS/static/js/main.9fd22fa0.js.map",
+    "main.204cdb60.js.map": "/procurement_system_MIS/static/js/main.204cdb60.js.map",
     "453.825386d9.chunk.js.map": "/procurement_system_MIS/static/js/453.825386d9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.d5c6cb31.css",
-    "static/js/main.9fd22fa0.js"
+    "static/js/main.204cdb60.js"
   ]
 }
