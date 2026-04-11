@@ -22,11 +22,12 @@ jobs:
 
       - name: Install and Build
         run: |
-          npm install
-          npm run build  # ده هيعمل فولدر اسمه dist أو build في الـ root
+          cd frontend           # الدخول لفولدر الفرونت
+          npm install           # تحميل المكتبات الخاصة بالفرونت
+          npm run build         # إنشاء نسخة النشر
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build  # لو بعد الـ build بيطلع فولدر اسمه build غير dist لـ build
+          publish_dir: ./frontend/dist  # تأكد لو اسم الفولدر build غيره هنا
