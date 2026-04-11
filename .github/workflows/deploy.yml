@@ -3,7 +3,7 @@ name: Build and Deploy Frontend
 on:
   push:
     branches:
-      - main  # هيشتغل لما ترفع كود على فرع main
+      - main
 
 permissions:
   contents: write
@@ -22,12 +22,11 @@ jobs:
 
       - name: Install and Build
         run: |
-          cd frontend  # <--- لو اسم فولدر الفرونت عندك مختلف، غيره هنا
           npm install
-          npm run build
+          npm run build  # ده هيعمل فولدر اسمه dist أو build في الـ root
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend/dist  # <--- لو بتستخدم React عادي غير dist لـ build
+          publish_dir: ./dist  # لو بعد الـ build بيطلع فولدر اسمه build غير dist لـ build
