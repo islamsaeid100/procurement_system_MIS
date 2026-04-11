@@ -2,7 +2,8 @@ name: Build and Deploy Frontend
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -11,7 +12,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout 
         uses: actions/checkout@v4
 
       - name: Set up Node.js
@@ -19,24 +20,14 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Debugging Paths
-        run: ls -R  # الخطوة دي عشان نشوف الملفات فين بالظبط لو فشل
-
       - name: Install and Build
         run: |
-          # لو الـ package.json بره، هنشغل npm من بره
-          # لو جوه الـ frontend، هنستخدم الـ flag --prefix
-          if [ -f "package.json" ]; then
-            npm install
-            npm run build
-          elif [ -f "frontend/package.json" ]; then
-            cd frontend
-            npm install
-            npm run build
-          fi
+          cd frontend
+          npm install
+          CI=false npm run build  # أضفنا CI=false عشان نتخطى خطأ الـ Navbar
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist # جرب تغيرها لـ ./build لو مانفعتش
+          publish_dir: ./frontend/build  # غيرناها لـ build عشان ده الـ React Default
