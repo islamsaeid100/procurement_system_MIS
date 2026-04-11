@@ -305,3 +305,50 @@ button:hover {
   align-items: center;
   justify-content: space-between;
 }
+/* حل سريع للموبايل */
+@media (max-width: 768px) {
+  /* 1. الحاوية الرئيسية: نلغي أي padding زيادة */
+  .container {
+      padding: 10px !important;
+      margin: 0 auto !important;
+      width: 100% !important;
+      box-sizing: border-box;
+  }
+
+  /* 2. الـ Navbar: نخليه ينزل تحت بعضه أو يخفي اللينكات */
+  .navbar {
+      flex-direction: column;
+      height: auto !important;
+      padding: 15px !important;
+  }
+
+  .nav-links {
+      flex-wrap: wrap; /* يخلي اللينكات تنزل سطر جديد لو مفيش مكان */
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+  }
+
+  /* 3. الكروت والداشبورد: نخليها تاخد العرض كامل */
+  .dashboard-grid, .stats-container {
+      grid-template-columns: 1fr !important; /* عمود واحد بدل 3 أو 4 */
+      gap: 15px;
+  }
+
+  /* 4. الجداول (Table): أكبر مشكلة في الموبايل */
+  /* الحل السهل: نخلي الجدول يتحرك يمين وشمال (Scroll) */
+  .table-wrapper, .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+      min-width: 600px; /* نضمن إن الجدول ميكشش ويصغر الخط فيه */
+  }
+
+  /* 5. الفورم (Login/Forms) */
+  .login-card {
+      width: 90% !important;
+      padding: 20px !important;
+  }
+}
