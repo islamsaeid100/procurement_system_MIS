@@ -6,9 +6,17 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
+        // 1. تنظيف التوكنات
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        window.location.href = '/login';
+        
+        // 2. التحويل الذكي باستخدام navigate
+        // بما إننا مستخدمين HashRouter، ده هيوديك لـ /#/login
+        // ويفضل محافظ على مسار المشروع في اللينك
+        navigate('/login');
+
+        // 3. إعادة تحميل الصفحة لضمان مسح الـ State بتاع isAuthenticated في App.js
+        window.location.reload();
     };
 
     return (
@@ -25,6 +33,7 @@ const Navbar = () => {
             </div>
 
             <ul className="nav-links">
+                {/* لاحظ استخدام NavLink هنا ممتاز لأنه بيتعامل صح مع الـ HashRouter */}
                 <li><NavLink to="/" end className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>Dashboard</NavLink></li>
                 <li><NavLink to="/suppliers" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>Suppliers</NavLink></li>
                 <li><NavLink to="/products" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>Products</NavLink></li>

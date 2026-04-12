@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api/',
+    // تم تغيير اللينك من localhost إلى سيرفر Render الحقيقي
+    baseURL: 'https://procurement-system-mis-1.onrender.com/api/',
 });
 
 api.interceptors.request.use((config) => {
